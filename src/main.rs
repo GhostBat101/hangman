@@ -40,8 +40,7 @@ impl CheckLetter for Word {
             } else {
                 if self.representation.chars().nth(index) != Some('_') {
                     response.push(self.representation.chars().nth(index).unwrap());
-                }
-                else {
+                } else {
                     response.push('_');
                 }
             }
@@ -69,12 +68,61 @@ fn read_list(filename: String) -> Vec::<String> {
             let word:String = w.unwrap();
             if word.len()> 4 {
                 v.push(word);
-            } else { println!("We have an error while reading the list.") }
+            }
         }
     }
     v
 }
 
+fn select_word() -> String {
+    let mut rng = rand::thread_rng();
+    let filename:String = "words.txt".to_string();
+    let words:Vec<String> = read_list(filename);
+    let word_count = words.len();
+    let selection = rng.gen_range(1..=word_count);
+    let select: String = words[selection].clone();
+    select
+}
+
 fn main() {
-    println!("Hello, world!");
+    let body = vec!["noose".to_string(), "head".to_string(), "neck".to_string(), "torso".to_string(), "left arm".to_string(),
+                    "right arm".to_string(), "right leg".to_string(), "left leg".to_string(), "left foot".to_string(), "right foot".to_string()];
+    let mut body_iter = body.iter();
+    let mut result = select_word();
+    let mut answer = Word {
+        length: result.len(),
+        representation: String::from_utf8(vec![b'_'; result.len()]).unwrap(),
+        answer: result,
+        correct_count: 0
+    };
+
+    let mut letter: char;
+    let mut body_complete: bool = false;
+    while !answer.check_complete() && !body_complete {
+        println!("Provide a letter to guess ");
+        let mut input = String::new();
+        match io::stdin().read_line(&mut input) {
+            Ok(n) => {
+                letter = input.chars().nth(0).unwrap();
+                if answer.check_for_letter(letter) {
+                    println!("There is at least one {}, so the word is {}", letter, answer.representation);
+                } else {
+                    let next_part = body_iter.next().unwrap();
+                    println!("Incorrect! You are at {}", next_part);
+                    if next_part == "right foot" {
+                        body_complete = true;
+                    }
+                }
+            }
+            Err(error) => {
+                println!("Didn't get any input");
+            }
+        }
+    }
+    if body_complete {
+        println!("You were unsuccessful at guessing {}", &answer.answer)
+    }
+    else {
+        println!("Yes! The word was {}", &answer.answer);
+    }
 }

@@ -1,0 +1,10 @@
+noose
+head
+neck
+torso
+left arm
+right arm
+right leg
+left leg
+left foot
+right foot
