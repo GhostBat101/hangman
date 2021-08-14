@@ -37,8 +37,7 @@ impl CheckLetter for Word {
                 found = true;
                 count += 1;
                 response.push(c);
-            }
-            else {
+            } else {
                 if self.representation.chars().nth(index) != Some('_') {
                     response.push(self.representation.chars().nth(index).unwrap());
                 }
@@ -55,6 +54,25 @@ impl CheckLetter for Word {
         self.correct_count += count;
         count> 0
     }
+}
+
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+    where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
+
+fn read_list(filename: String) -> Vec::<String> {
+    let mut v = Vec::<String>::new();
+    if let Ok(lines) = read_lines(filename) {
+        for w in lines {
+            let word:String = w.unwrap();
+            if word.len()> 4 {
+                v.push(word);
+            } else { println!("We have an error while reading the list.") }
+        }
+    }
+    v
 }
 
 fn main() {
